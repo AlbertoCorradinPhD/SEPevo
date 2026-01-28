@@ -1,5 +1,5 @@
 # SEPevo
-This repository anticipates the publication of the manuscript "SEPevo: An Explainable AI Framework for Stock Prediction Using Large Language Models and Reinforcement Learning*" (in preparation).
+This repository anticipates the publication of the manuscript "SEPevo: An Explainable AI Framework for Stock Prediction Using Large Language Models and Reinforcement Learning" (in preparation).
 
 # Abstract
 This presentation introduces a modular and reproducible software framework for explainable stock prediction that integrates large language models (LLMs), reinforcement learning, and parameter-efficient fine-tuning techniques to jointly address predictive accuracy and interpretability in financial forecasting. The system is designed to ingest and process high-volume, unstructured real-time data from social media and financial news, leveraging transformer-based LLM architectures and the Hugging Face ecosystem for robust natural language understanding, summarization, and contextual analysis. Central to the framework is the Summarize–Explain–Predict (SEP) paradigm, which decomposes the workflow into modular stages for data summarization, reflective reasoning, and prediction. These stages are implemented through specialized data loaders, collators, and prompt-driven agents that enable iterative self-reflection and explanation refinement.
