@@ -1,0 +1,146 @@
+import os, sys
+sys.path.insert(0,os.getcwd() )
+
+
+from typing import List, Union, Literal
+from utils.llm import OpenAILLM, NShotLLM #, FastChatLLM
+from utils.prompts import REFLECT_INSTRUCTION, PREDICT_INSTRUCTION, PREDICT_REFLECT_INSTRUCTION, REFLECTION_HEADER
+from utils.fewshots import PREDICT_EXAMPLES
+from explain_module.get_sentiment import get_sentiment
+import re
+
+
+class PredictAgent(object):
+	def __init__(self,
+				 ticker: str,
+				 summary: str,
+				 target: str,
+				 generation_kwargs=None,
+				 predict_llm=None
+				 ) -> None:
+
+		self.ticker = ticker
+		self.summary = summary
+		self.target = target
+		self.prediction = ''
+
+		# Create LLM automatically if none provided
+		if predict_llm is None:
+			predict_llm = OpenAILLM(
+				model="gpt-4o-2024-11-20",
+				generation_kwargs=generation_kwargs,
+			)
+ 
+		self.llm = predict_llm
+		self.predict_prompt = PREDICT_INSTRUCTION
+		self.predict_examples = PREDICT_EXAMPLES
+
+		self.__reset_agent()
+
+
+	def run(self, reset=True) -> None:
+		if reset:
+			self.__reset_agent()
+
+		facts = "Facts:\n" + self.summary + "\n\nPrice Movement: "
+		self.scratchpad += facts
+		# debug
+		print(facts, end="")
+
+		self.scratchpad += self.prompt_agent()
+		response = self.scratchpad.split('Price Movement: ')[-1]
+		print(response, end="\n\n\n\n")
+		self.prediction = get_sentiment(response)
+
+		self.finished = True
+
+	def prompt_agent(self) -> str:
+		return self.llm(self._build_agent_prompt())
+
+	def _build_agent_prompt(self) -> str:
+		return self.predict_prompt.format(
+							ticker = self.ticker,
+							examples = self.predict_examples,
+							summary = self.summary)
+
+	def is_finished(self) -> bool:
+		return self.finished
+
+	def is_correct(self) -> bool:
+		return EM(self.target, self.prediction)
+
+	def __reset_agent(self) -> None:
+		self.finished = False
+		self.scratchpad: str = ''
+
+
+class PredictReflectAgent(PredictAgent):
+	def __init__(self,
+				ticker: str,
+				summary: str,
+				target: str,
+				generation_kwargs=None,
+				predict_llm=None,
+				reflect_llm=None
+				) -> None:
+
+		super().__init__(ticker, summary, target, generation_kwargs, predict_llm)
+
+		if reflect_llm is None:
+			reflect_llm = OpenAILLM(
+				model="gpt-4.1",
+				generation_kwargs=generation_kwargs,			
+			)
+
+		# Additional attributes specific to PredictReflectAgent
+		self.predict_llm = self.llm
+		self.reflect_llm = reflect_llm
+		self.reflect_prompt = REFLECT_INSTRUCTION
+		self.agent_prompt = PREDICT_REFLECT_INSTRUCTION
+		self.reflections = []
+		self.reflections_str: str = ''
+
+
+	def run(self, reset=True) -> None:
+		if self.is_finished() and not self.is_correct():
+			self.reflect()
+
+		PredictAgent.run(self, reset=reset)
+
+	def reflect(self) -> None:
+		print('Reflecting...\n')
+		reflection = self.prompt_reflection()
+		self.reflections += [reflection]
+		self.reflections_str = format_reflections(self.reflections)
+		print(self.reflections_str, end="\n\n\n\n")
+
+	def prompt_reflection(self) -> str:
+		return self.reflect_llm(self._build_reflection_prompt())
+
+	def _build_reflection_prompt(self) -> str:
+		return self.reflect_prompt.format(
+							ticker = self.ticker,
+							scratchpad = self.scratchpad)
+
+	def _build_agent_prompt(self) -> str:
+		prompt = self.agent_prompt.format(
+							ticker = self.ticker,
+							examples = self.predict_examples,
+							reflections = self.reflections_str,
+							summary = self.summary)
+		return prompt
+
+	
+	def run_n_shots(self, model, tokenizer, reward_model, args, generation_kwargs) -> None:
+		self.llm = NShotLLM(model, tokenizer, reward_model, args, generation_kwargs)
+		PredictAgent.run(self, reset=True)
+
+
+def format_reflections(reflections: List[str], header: str = REFLECTION_HEADER) -> str:
+	if reflections == []:
+		return ''
+	else:
+		return header + 'Reflections:\n- ' + '\n- '.join([r.strip() for r in reflections])
+
+def EM(prediction, sentiment) -> bool:
+	return prediction.lower().strip() == sentiment.lower().strip()
