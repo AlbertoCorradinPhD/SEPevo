@@ -17,6 +17,69 @@ from tenacity import (
 # from fastchat.model import get_conversation_template
 import torch
 
+# for Gemini
+from google import genai
+from google.genai import types
+
+
+import os
+from google import genai
+from google.genai import types
+from tenacity import retry, wait_random_exponential, stop_after_attempt
+
+class GeminiLLM(object): 
+    def __init__(self, model="gemini-2.0-flash", generation_kwargs=None): 
+        """ 
+        Initializes the Gemini client using an API Key.
+        """ 
+        self.model = model 
+        self.generation_kwargs = generation_kwargs or {} 
+        # Store the key in the instance so __setstate__ can find it later
+        self.api_key = os.environ.get("GOOGLE_API_KEY")
+        self._init_client()
+
+    def _init_client(self):
+        """
+        Initializes the client using the API Key. 
+        Note: vertexai is set to False (default).
+        """
+        if not self.api_key:
+            raise ValueError("GEMINI_API_KEY not found in environment variables.")
+            
+        self.client = genai.Client(api_key=self.api_key)
+
+    def __getstate__(self):
+        """
+        Removes the live client connection before pickling.
+        """
+        state = self.__dict__.copy()
+        if "client" in state:
+            del state["client"]
+        return state
+
+    def __setstate__(self, state):
+        """
+        Restores state and re-establishes the API connection.
+        """
+        self.__dict__.update(state)
+        self._init_client()
+
+    @retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(6)) 
+    def __call__(self, prompt: str) -> str: 
+        config = types.GenerateContentConfig( 
+            temperature=self.generation_kwargs.get('temperature', 0.1), 
+            top_p=self.generation_kwargs.get('top_p', 0.95), 
+            max_output_tokens=self.generation_kwargs.get('max_new_tokens', 1024), 
+        ) 
+
+        response = self.client.models.generate_content( 
+            model=self.model, 
+            contents=prompt, 
+            config=config 
+        ) 
+         
+        return response.text
+
 
 class OpenAILLM(object):
 	def __init__(self, model, generation_kwargs=None):

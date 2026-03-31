@@ -1,4 +1,4 @@
-SUMMARIZE_RP = """Act as a stock market expert and summarize the most recent market news. Report facts only and do not include opinions, interpretations, or analysis."""
+SUMMARIZE_RP = """Act as a stock market expert and summarize the most recent market news. Report facts only and do not include opinions, interpretations, or analysis.\n"""
 
 SUMMARIZE_INCIPIT ="""Execute the instructions below using English only. If the answer cannot be determined from the given information, explicitly state that the information is unavailable and do not fabricate any part of the response.
 Instructions: """
@@ -29,6 +29,22 @@ SUMMARIZE_REFINEMENT = """\nFinally, revise your response:
 - refine the reported dates (if any) 
 - do not distort nor cut the {ticker} name
 - ensure proper English grammar."""
+
+SUMMARIZE_INSTRUCTION_GEMINI = """You are given a list of tweets about the a user-defined stock. Your task is to provide a concise summary of the key facts related to this stock, based solely on the content of the tweets. 
+You shall follow these indications:
+- Focus on the most significant information. Avoid unnecessary details, opinions, or speculative statements.
+- Do not search the internet for additional insights. Do not perform coding. Only include what is directly mentioned in the tweets.
+- Keep the summary brief and to the point. Ignore tweets that are jokes, hype, memes, personal opinions without evidence, or vague predictions.
+- Do not infer, speculate, or extrapolate beyond what is explicitly stated.
+- Is some themes or concrete facts are recurring, summarize them instead of reporting individual tweets. Use at most 3 bullet points or one short paragraph if possible.
+- Keep the summary brief and to the point, namely strictly focused on the user-defined stock.
+Here are some examples:
+{examples}
+(END OF EXAMPLES)
+
+Facts:"""
+
+
 
 PREDICT_INSTRUCTION = """Given a list of factual statements, assess their potential impact on the price movement of {ticker} stock. Provide your response in the following format:
 (1) Price Movement: Select either 'Positive' or 'Negative'.

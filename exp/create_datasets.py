@@ -21,7 +21,7 @@ def create_sft_dataset(samples_path, args, generation_kwargs, data_summarized=No
 			print("No agents at all. I exit")
 			sys.exit
 		else:
-			print("Number of test agents: ",str(len(agents)))
+			print("Number of agents: ",str(len(agents)))
 				
 		for isx, agent in enumerate(agents):
 			print("Let agent predict. Agent number: ", str(isx+1),"\n")

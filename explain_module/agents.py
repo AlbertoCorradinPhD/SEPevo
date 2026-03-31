@@ -3,7 +3,7 @@ sys.path.insert(0,os.getcwd() )
 
 
 from typing import List, Union, Literal
-from utils.llm import OpenAILLM, NShotLLM #, FastChatLLM
+from utils.llm import OpenAILLM, NShotLLM, GeminiLLM #, FastChatLLM
 from utils.prompts import REFLECT_INSTRUCTION, PREDICT_INSTRUCTION, PREDICT_REFLECT_INSTRUCTION, REFLECTION_HEADER
 from utils.fewshots import PREDICT_EXAMPLES
 from explain_module.get_sentiment import get_sentiment
@@ -12,24 +12,30 @@ import re
 
 class PredictAgent(object):
 	def __init__(self,
-				 ticker: str,
-				 summary: str,
-				 target: str,
-				 generation_kwargs=None,
-				 predict_llm=None
-				 ) -> None:
+				ticker: str,
+				summary: str,
+				target: str,
+				generation_kwargs=None,
+				predict_llm=None
+				) -> None:
 
 		self.ticker = ticker
 		self.summary = summary
 		self.target = target
 		self.prediction = ''
 
-		# Create LLM automatically if none provided
-		if predict_llm is None:
+		# Create LLM automatically based on a string identifier or if none provided
+		if isinstance(predict_llm, str) and predict_llm.lower() == 'gemini':
+			predict_llm = GeminiLLM(
+				model="gemini-2.0-flash", 
+				generation_kwargs=generation_kwargs,
+				)
+		else:
+			# Fallback default (e.g., GPT or Gemini)
 			predict_llm = OpenAILLM(
 				model="gpt-4o-2024-11-20",
 				generation_kwargs=generation_kwargs,
-			)
+				)
  
 		self.llm = predict_llm
 		self.predict_prompt = PREDICT_INSTRUCTION
@@ -50,7 +56,7 @@ class PredictAgent(object):
 		self.scratchpad += self.prompt_agent()
 		response = self.scratchpad.split('Price Movement: ')[-1]
 		print(response, end="\n\n\n\n")
-		self.prediction = get_sentiment(response)
+		self.prediction = get_sentiment(response, self.llm)
 
 		self.finished = True
 
@@ -86,11 +92,18 @@ class PredictReflectAgent(PredictAgent):
 
 		super().__init__(ticker, summary, target, generation_kwargs, predict_llm)
 
-		if reflect_llm is None:
+		# Create LLM automatically based on a string identifier or if none provided
+		if isinstance(reflect_llm, str) and reflect_llm.lower() == 'gemini':
+			reflect_llm = GeminiLLM(
+				model="gemini-2.0-flash", 
+				generation_kwargs=generation_kwargs,
+				)
+		else:
+			# Fallback default (e.g., GPT or Gemini)
 			reflect_llm = OpenAILLM(
 				model="gpt-4.1",
-				generation_kwargs=generation_kwargs,			
-			)
+				generation_kwargs=generation_kwargs,
+				)
 
 		# Additional attributes specific to PredictReflectAgent
 		self.predict_llm = self.llm

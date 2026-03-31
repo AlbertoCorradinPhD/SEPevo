@@ -18,7 +18,13 @@ def get_agents(args, generation_kwargs, suffix='prediction', data_summarized=Non
 	elif data_summarized is not None:
 		print("Initializing Agents...")
 		agent_cls = PredictReflectAgent # this is the class, not the instance
-		agents = [agent_cls(row['ticker'], row['summary'], row['target'], generation_kwargs=generation_kwargs) for _, row in data_summarized.iterrows()]
+		agents = [agent_cls(row['ticker'], 
+					row['summary'], 
+					row['target'], 
+					generation_kwargs=generation_kwargs,
+					predict_llm= args.predict_llm,
+					reflect_llm= args.reflect_llm,
+					) for _, row in data_summarized.iterrows()]
 		print("Agents were initialized with data")
 		return agents
 		

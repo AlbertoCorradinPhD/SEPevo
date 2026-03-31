@@ -3,6 +3,7 @@ sys.path.insert(0,os.getcwd() )
 
 from summarize_module.summarizer_openAI import Summarizer_openAI
 from summarize_module.summarizer_hf import Summarizer_hf
+from summarize_module.summarizer_Gemini import GeminiSummarizer
 
 
 import os, json
@@ -17,7 +18,12 @@ class DataLoader:
 		self.price_dir = args.price_dir
 		self.tweet_dir = args.tweet_dir
 		self.seq_len = args.seq_len
-		self.summarizer = Summarizer_openAI() if args.summarizer is None else Summarizer_hf(model_path=args.summarizer)
+		if args.summarizer is None:
+			 self.summarizer = Summarizer_openAI()
+		elif "gemini" in args.summarizer.lower():
+			self.summarizer = GeminiSummarizer()
+		else:
+			 self.summarizer = Summarizer_hf(model_path=args.summarizer)
 		self.max_stocks= args.max_stocks
 		self.data_dir= args.data_dir
 		self.max_instances_per_stock= args.max_instances_per_stock
@@ -71,6 +77,9 @@ class DataLoader:
 			files_to_process = random.sample(all_files, self.max_stocks)			
 		else:
 			files_to_process = all_files
+		"""
+		files_to_process= ["TSLA.csv", "NVDA.csv", "PFE.csv"]
+		"""
 		
 		timestr = time.strftime("%Y%m%d-%H%M%S")
 		file_path=os.path.join(self.data_dir,flag+'_stocks_'+timestr+'.txt')

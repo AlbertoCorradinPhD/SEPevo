@@ -48,10 +48,8 @@ def save_agents(agents, res_dir, suffix='prediction', batch_number=None):
 		for i, agent in enumerate(agents):
 			if suffix=="test":
 				agent.llm=None
-			if batch_number is None:
-				joblib.dump(agent, os.path.join(output_path, f'{i}.joblib'))
-			else:
-				joblib.dump(agent, os.path.join(output_path, f'{batch_number}{i}.joblib'))
+			filename = f'{i}.joblib' if batch_number is None else f'{batch_number}{i}.joblib'
+			joblib.dump(agent, os.path.join(output_path, filename))
 	except Exception as e:
 		print(f"Error while saving: {e}")
 		

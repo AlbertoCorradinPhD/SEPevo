@@ -6,7 +6,6 @@ from utils.fewshots import SUMMARIZE_EXAMPLES
 from models_module.load_hf_models import load_hf_model
 from toolbox.generate_retry import generate_retry
 from toolbox.miscellaneous import subdivide_list
-from utils.clear_cache import clear_cache 
 
 import math
 import re

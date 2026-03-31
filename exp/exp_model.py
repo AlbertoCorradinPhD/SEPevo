@@ -68,7 +68,7 @@ class Exp_Model:
 		samples_path= os.path.join(self.args.data_dir, "samples_log.json")
 		output_dir=create_sft_dataset(samples_path, self.args, self.generation_kwargs, data_summarized=data_summarized)
 		if output_dir is not None:
-			print("Results of reflective trials were saved in folder:", output_dir)
+			print("Results of predictive step were saved in folder:", output_dir)
 		del data_summarized
 		clear_cache()
 		

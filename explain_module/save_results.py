@@ -70,7 +70,6 @@ def save_results(agents, res_dir, suffix='prediction'):
 	tn = cm[neg_idx, neg_idx]
 	fp = cm[neg_idx, pos_idx]+cm[neu_idx, pos_idx]
 	fn = cm[pos_idx, neg_idx]+cm[neu_idx, neg_idx]
-	predicted_neutral = sum(cm[:,neu_idx])
 	neutral = sum(cm[neu_idx,:])
 	missed_movements = cm[pos_idx, neu_idx]+ cm[neg_idx, neu_idx]
 
@@ -95,8 +94,8 @@ def save_results(agents, res_dir, suffix='prediction'):
 	# Create a coefficients DataFrame with metrics
 	coefficients = {
 		'Metric': ['True Positives', 'True Negatives', 'False Positives', 'False Negatives', 'Sensitivity', 'Specificity', 'Precision','Recall', 
-				'F1 score', 'Accuracy', 'Matthews Correlation Coefficient', 'Predicted neutral', 'Neutral', 'Missed movements'],
-		'Value': [tp, tn, fp, fn, sensitivity, specificity, precision, recall, f1_score, accuracy, mcc, predicted_neutral, neutral, missed_movements]
+				'F1 score', 'Accuracy', 'Matthews Correlation Coefficient', 'Neutral', 'Missed movements'],
+		'Value': [tp, tn, fp, fn, sensitivity, specificity, precision, recall, f1_score, accuracy, mcc, neutral, missed_movements]
 	}
 
 	coefficients_df = pd.DataFrame(coefficients)

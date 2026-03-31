@@ -15,12 +15,14 @@ def settings():
 	# load data
 	parser.add_argument("--price_dir", type=str, default="price/raw/") # Set to "data/sample_price/preprocessed/" for test
 	parser.add_argument("--tweet_dir", type=str, default="tweet/raw/") # Set to "data/sample_tweet/raw/" for test
-	parser.add_argument("--summarizer", type=str, default="curiousily/Llama-3-8B-Instruct-Finance-RAG")
+	parser.add_argument("--summarizer", type=str, default="gemini") #"curiousily/Llama-3-8B-Instruct-Finance-RAG"
 	parser.add_argument("--seq_len", type=int, default=2)
 	parser.add_argument("--max_stocks", type=int, default=5) 
 	parser.add_argument("--max_instances_per_stock", type=int, default=300)
 	parser.add_argument("--num_repetitions", type=int, default=5) 
 	parser.add_argument("--num_reflect_trials", type=int, default=4)
+	parser.add_argument("--predict_llm", type=str, default="gemini") # None
+	parser.add_argument("--reflect_llm", type=str, default="gemini") # None
 			
 	#NLP
 	parser.add_argument("--cutoff_len", type=int, default=2048, help="Max length for instruction+response") # optimal input size for the model

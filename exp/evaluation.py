@@ -54,7 +54,7 @@ def gather_results(output_dir):
 	
 	# Ensure the required metrics are present in the DataFrame
 	metrics=['True Positives', 'True Negatives', 'False Positives', 'False Negatives', 'Sensitivity', 'Specificity', 'Precision','Recall', 
-				'F1 score', 'Accuracy', 'Matthews Correlation Coefficient', 'Predicted neutral', 'Neutral', 'Missed movements']
+				'F1 score', 'Accuracy', 'Matthews Correlation Coefficient', 'Neutral', 'Missed movements']
 
 	# Ensure all metrics are in the DataFrame; if missing, fill with NaN
 	for metric in metrics:
@@ -65,14 +65,13 @@ def gather_results(output_dir):
 	print(df)
 
 	# Calculate metrics if required metrics are available
-	required_indices = {'True Positives', 'True Negatives', 'False Positives', 'False Negatives', 'Predicted neutral', 'Neutral', 'Missed movements'}
+	required_indices = {'True Positives', 'True Negatives', 'False Positives', 'False Negatives', 'Neutral', 'Missed movements'}
 	if required_indices.issubset(df.index):
 			
 		tp = df.loc['True Positives'].sum()
 		tn = df.loc['True Negatives'].sum()
 		fp = df.loc['False Positives'].sum()
 		fn = df.loc['False Negatives'].sum()
-		predicted_neutral= df.loc['Predicted neutral'].sum()
 		neutral= df.loc['Neutral'].sum()
 		missed_movements = df.loc['Missed movements'].sum()
 
@@ -87,7 +86,7 @@ def gather_results(output_dir):
 		# Prepare results as a DataFrame
 		coefficients = {
 			'Metric': metrics,
-			'Value': [tp, tn, fp, fn, sensitivity, specificity, precision, recall, f1_score, accuracy, mcc, predicted_neutral, neutral, missed_movements]
+			'Value': [tp, tn, fp, fn, sensitivity, specificity, precision, recall, f1_score, accuracy, mcc, neutral, missed_movements]
 		}
 		
 		coefficients_df = pd.DataFrame(coefficients)
