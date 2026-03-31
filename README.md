@@ -7,6 +7,5 @@ In this paper, we describe a modular framework for explainable stock prediction 
 # Use
 For further information, please contact [alberto_corradin@hotmail.com](mailto:alberto_corradin@hotmail.com). Additional details are available at [https://github.com/koa-fin/sep](https://github.com/koa-fin/sep).
 SEPevo enhances the original algorithm published by Koa et al. (2004); therefore, the commands to run it remain unchanged, as does the database used for training and testing this AI/ML pipeline ([https://github.com/koa-fin/sn2](https://github.com/koa-fin/sn2)).
-The deployment of the algorithm was carried out on Google Cloud Platform (GCP). As a result, certain components of this repository require appropriate GCP API keys and authorization credentials to function correctly. In particular, scripts such as `requirements.lock.txt`, `mount_bucket.py`, and 'build_project.py' are specific to the GCP-based deployment and may need adaptation for use in other environments.
-
+The deployment of the algorithm was carried out on Google Cloud Platform (GCP). As a result, certain components of this repository require appropriate GCP API keys and authorization credentials to function correctly. In particular, scripts such as `requirements.lock.txt`, `mount_bucket.py`, and `build_project.py` are specific to the GCP-based deployment and may need adaptation for use in other environments.
 
